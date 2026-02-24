@@ -1,0 +1,10 @@
+{
+  "handoffMode": "clipboard",
+  "_comment": "handoffMode options:",
+  "_comment": "  'clipboard' - Resume prompt is copied to clipboard after clearing context",
+  "_comment": "  'auto-paste' - Resume prompt is automatically executed after clearing context",
+  "_comment": "",
+  "_comment": "You can override this setting per invocation with:",
+  "_comment": "  /handoff --clipboard",
+  "_comment": "  /handoff --auto"
+}

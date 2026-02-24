@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Generated files (keep example handoffs, ignore personal ones)
+# docs/handoffs/AI_Continuation_Document-*.md
+# Uncomment above to exclude all handoffs, or keep them to show examples
+
+# Logs
+*.log
+
+# Environment variables
+.env
+.env.local

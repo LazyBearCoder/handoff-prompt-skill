@@ -1,0 +1,272 @@
+# Handoff Prompt Skill for Claude Code
+
+A Claude Code skill that generates structured AI continuation documents using the [handoff-prompt methodology](https://www.dontsleeponai.com/handoff-prompt). Never lose context when clearing your AI's memory again.
+
+## What It Does
+
+When your AI context window fills up, you have two bad options: keep pushing and watch quality degrade, or start over and lose everything. Handoff-prompt gives you a third option: **clear your context on purpose** and use a structured document so the next AI picks up exactly where you left off.
+
+This skill automates that process by:
+1. Analyzing your current conversation and project state
+2. Generating a structured continuation document with 8 sections
+3. Saving it to `docs/handoffs/`
+4. Clearing your context
+5. Providing a resume prompt for your fresh AI session
+
+## Quick Start
+
+### 1. Install the Skill
+
+Copy `handoff-prompt.md` to your Claude Code skills directory:
+
+```bash
+# macOS/Linux
+mkdir -p ~/.claude/skills
+cp handoff-prompt.md ~/.claude/skills/
+
+# Or with the full path
+cp handoff-prompt.md ~/.claude/skills/handoff-prompt.md
+```
+
+### 2. Configure (Optional)
+
+Add the handoff mode setting to your Claude Code `settings.json`:
+
+```bash
+# Edit your settings
+~/.claude/settings.json
+```
+
+Add this configuration:
+
+```json
+{
+  "handoffMode": "clipboard"
+}
+```
+
+**Modes:**
+- `clipboard` (default) — Resume prompt is copied to clipboard after clearing context. You paste it manually.
+- `auto-paste` — Resume prompt is automatically executed in the fresh conversation.
+
+### 3. Use It
+
+```bash
+# Basic usage — generates handoff, no specific next task
+/handoff
+
+# With a directive for the next AI
+/handoff continue implementing the user authentication flow
+
+# Override mode for this invocation only
+/handoff --auto
+/handoff --clipboard
+```
+
+## What Gets Generated
+
+The continuation document (`docs/handoffs/AI_Continuation_Document-DATE-TIME.md`) includes:
+
+| Section | Purpose |
+|---------|---------|
+| **Project Identity** | What this project is, objectives, constraints |
+| **Current System State** | What's built, partial, broken, not started |
+| **Architecture & Technical Map** | Tech stack, data structures, naming conventions |
+| **Recent Work** (Highest Priority) | What was done, decisions made and WHY — recency-weighted |
+| **What Could Go Wrong** | Known bugs, edge cases, technical debt |
+| **How to Think About This Project** | Design philosophy, common mistakes, anti-patterns |
+| **Do Not Touch List** | Guardrails to prevent regressing working code |
+| **Confidence Flags** | High/Medium/Low confidence per section |
+
+## How It Works
+
+### The Problem
+
+Generic AI summaries treat all information equally, producing bloated output that buries important details. They don't capture *why* you made decisions — only *what* you built.
+
+### The Solution
+
+Handoff-prompt uses:
+
+1. **Recency weighting** — What you did in the last 30 minutes matters 10x more than what you did 3 hours ago
+2. **Reasoning preservation** — Captures the reasoning behind decisions, not just the decisions themselves
+3. **Regression protection** — Explicit "Do Not Touch" list prevents the next AI from undoing your work
+4. **Confidence flags** — The next AI knows what to trust and what to double-check
+
+## Workflow Example
+
+```bash
+# You've been working for hours, context is getting heavy
+/handoff
+
+# Skill generates: docs/handoffs/AI_Continuation_Document-24Feb2026-1435.md
+# Context is cleared automatically
+# Resume prompt is in clipboard (or auto-executed if configured)
+
+# In your fresh conversation, paste the resume prompt:
+# "I've read the continuation document. I understand the project state,
+# the recent work on the authentication system, and the Do Not Touch list.
+# What would you like me to work on next?"
+
+# You reply: "Continue with the password reset flow"
+```
+
+## Configuration
+
+### Setting: handoffMode
+
+| Value | Behavior |
+|-------|----------|
+| `clipboard` | Copy resume prompt to clipboard after `/clear` |
+| `auto-paste` | Automatically execute resume prompt after `/clear` |
+
+**Location:** `~/.claude/settings.json`
+
+```json
+{
+  "handoffMode": "auto-paste"
+}
+```
+
+### Per-Invocation Override
+
+You can override your default setting for any invocation:
+
+```bash
+/handoff --auto        # Force auto-paste mode
+/handoff --clipboard   # Force clipboard mode
+```
+
+## File Structure
+
+```
+handoff-prompt-skill/
+├── handoff-prompt.md       # The skill file (install this)
+├── README.md               # This file
+├── settings.example.json   # Example configuration
+├── context_monitor.py      # Context usage monitoring tool
+├── handoff_cli.py          # Handoff document manager CLI
+├── analytics.py            # Analytics and reporting tool
+└── docs/
+    └── handoffs/           # Generated continuation documents go here
+        └── AI_Continuation_Document-*.md
+```
+
+## Python Tools
+
+Three standalone Python scripts are included to enhance your handoff workflow:
+
+### 1. Context Monitor (`context_monitor.py`)
+
+Monitors your Claude Code context usage and suggests running `/handoff` when approaching threshold.
+
+```bash
+# Check current context status
+python context_monitor.py
+
+# Continuously monitor (updates every 30s)
+python context_monitor.py --watch
+
+# Set custom threshold (default: 80%)
+python context_monitor.py --threshold 75
+
+# Get JSON output for scripting
+python context_monitor.py --json
+
+# Show hook installation instructions
+python context_monitor.py --install-hook
+```
+
+**Features:**
+- Estimates token usage from conversation files
+- Visual progress bar with status indicators
+- Configurable warning threshold
+- Watch mode for continuous monitoring
+- Can be installed as a SessionStart hook
+
+### 2. Handoff CLI (`handoff_cli.py`)
+
+Manage and search your handoff documents.
+
+```bash
+# List all handoff documents
+python handoff_cli.py list
+
+# Show the most recent handoff
+python handoff_cli.py show latest
+
+# Show a specific handoff by number
+python handoff_cli.py show 1
+
+# Search across all handoffs
+python handoff_cli.py search "authentication"
+
+# Compare two handoffs
+python handoff_cli.py diff 1 2
+python handoff_cli.py diff latest 2
+
+# Extract a specific section
+python handoff_cli.py extract latest "recent work"
+```
+
+**Features:**
+- List all handoffs with timestamps and descriptions
+- View specific handoffs or sections
+- Full-text search across all documents
+- Diff comparison between handoffs
+- Extract individual sections
+
+### 3. Analytics (`analytics.py`)
+
+Generate insights from your handoff history.
+
+```bash
+# Overall summary
+python analytics.py summary
+
+# Visual timeline of project
+python analytics.py timeline
+
+# Confidence trends
+python analytics.py confidence
+
+# Extract and categorize issues
+python analytics.py issues
+
+# Generate full HTML report
+python analytics.py report
+
+# Export data as JSON
+python analytics.py --export json
+```
+
+**Features:**
+- Project timeline visualization
+- Confidence trend analysis across sections
+- Issue extraction and categorization
+- HTML report generation
+- JSON data export
+
+## Credits
+
+**Methodology:** [Don't Sleep On AI — handoff-prompt](https://www.dontsleeponai.com/handoff-prompt)
+
+This skill packages the handoff-prompt methodology (v1.1) as an easy-to-use Claude Code skill.
+
+**Version:** 1.0.0
+
+## License
+
+This skill is provided as-is for use with Claude Code. The underlying handoff-prompt methodology is from dontsleeponai.com.
+
+## Contributing
+
+Ideas for improvements:
+- [x] Auto-detect context threshold and suggest `/handoff` → `context_monitor.py`
+- [x] Visual analytics from handoff history → `analytics.py`
+- [x] Handoff document management → `handoff_cli.py`
+- [ ] Support for multiple handoff documents (e.g., per-feature)
+- [ ] Integration with git to link handoffs to commits
+- [ ] Visual confidence indicators in generated documents
+
+Feel free to fork, modify, and share your improvements.
