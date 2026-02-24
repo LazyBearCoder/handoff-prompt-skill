@@ -38,20 +38,32 @@ cp -r handoff-prompt ~/.claude/skills/
 
 ### 2. Configure (Optional)
 
-Add settings to your Claude Code `settings.json`:
+Settings are stored using a fallback chain:
+
+1. **Project-level** — `.claude/skills/handoff-prompt/config.json` (overrides all others)
+2. **Skill-level** — `~/.claude/skills/handoff-prompt/config.json` (global default)
+3. **Prompt user** — If neither exists, ask and save to skill-level config
+
+Create the config file manually:
 
 ```bash
-# Edit your settings
-~/.claude/settings.json
-```
-
-Add this configuration:
-
-```json
+# Global config (default)
+mkdir -p ~/.claude/skills/handoff-prompt
+cat > ~/.claude/skills/handoff-prompt/config.json << EOF
 {
   "continuationMethod": "ask",
   "handoffMode": "clipboard"
 }
+EOF
+
+# Project-level override (optional)
+mkdir -p .claude/skills/handoff-prompt
+cat > .claude/skills/handoff-prompt/config.json << EOF
+{
+  "continuationMethod": "handoff",
+  "handoffMode": "auto-paste"
+}
+EOF
 ```
 
 **continuationMethod** — Choose how to handle context clearing:
@@ -136,10 +148,14 @@ Handoff-prompt uses:
 | `clipboard` | Copy resume prompt to clipboard after `/clear` |
 | `auto-paste` | Automatically execute resume prompt after `/clear` |
 
-**Location:** `~/.claude/settings.json`
+**Location:** Store in config file using the fallback chain:
+
+1. Project-level: `.claude/skills/handoff-prompt/config.json`
+2. Skill-level: `~/.claude/skills/handoff-prompt/config.json`
 
 ```json
 {
+  "continuationMethod": "handoff",
   "handoffMode": "auto-paste"
 }
 ```
