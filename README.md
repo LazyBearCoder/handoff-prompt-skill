@@ -17,16 +17,24 @@ This skill automates that process by:
 
 ### 1. Install the Skill
 
-Copy `handoff-prompt.md` to your Claude Code skills directory:
+Copy the entire `handoff-prompt` folder to your Claude Code skills directory:
 
 ```bash
-# macOS/Linux
-mkdir -p ~/.claude/skills
-cp handoff-prompt.md ~/.claude/skills/
+# Clone or download the repository
+git clone https://github.com/LazyBearCoder/handoff-prompt-skill.git
+cd handoff-prompt-skill
 
-# Or with the full path
-cp handoff-prompt.md ~/.claude/skills/handoff-prompt.md
+# Copy the skill folder to your global skills directory
+mkdir -p ~/.claude/skills
+cp -r handoff-prompt ~/.claude/skills/
+
+# The skill is now available globally as /handoff
 ```
+
+**What gets installed:**
+- `SKILL.md` — The main skill file with instructions
+- `scripts/` — Python tools (context_monitor.py, handoff_cli.py, analytics.py)
+- `references/` — Optional documentation
 
 ### 2. Configure (Optional)
 
@@ -168,41 +176,46 @@ When you're about to clear your context, you now have two options:
 ## File Structure
 
 ```
-handoff-prompt-skill/
-├── handoff-prompt.md       # The skill file (install this)
-├── README.md               # This file
-├── settings.example.json   # Example configuration
-├── context_monitor.py      # Context usage monitoring tool
-├── handoff_cli.py          # Handoff document manager CLI
-├── analytics.py            # Analytics and reporting tool
-└── docs/
-    └── handoffs/           # Generated continuation documents go here
+handoff-prompt/              # Skill folder (install this entire folder)
+├── SKILL.md                 # The main skill file with YAML frontmatter
+├── scripts/                 # Python utilities
+│   ├── context_monitor.py   # Context usage monitoring tool
+│   ├── handoff_cli.py       # Handoff document manager CLI
+│   └── analytics.py         # Analytics and reporting tool
+├── references/              # Optional documentation
+├── README.md                # This file (for GitHub visitors)
+├── LICENSE                  # MIT License
+├── settings.example.json    # Example configuration
+└── docs/                    # Generated continuation documents go here
+    └── handoffs/
         └── AI_Continuation_Document-*.md
 ```
+
+**Note:** The folder structure follows the official [Claude Skills specification](https://resources.anthropic.com/hubfs/The-Complete-Guide-to-Building-Skill-for-Claude.pdf).
 
 ## Python Tools
 
 Three standalone Python scripts are included to enhance your handoff workflow:
 
-### 1. Context Monitor (`context_monitor.py`)
+### 1. Context Monitor (`scripts/context_monitor.py`)
 
 Monitors your Claude Code context usage and suggests running `/handoff` when approaching threshold.
 
 ```bash
 # Check current context status
-python context_monitor.py
+python scripts/context_monitor.py
 
 # Continuously monitor (updates every 30s)
-python context_monitor.py --watch
+python scripts/context_monitor.py --watch
 
 # Set custom threshold (default: 80%)
-python context_monitor.py --threshold 75
+python scripts/context_monitor.py --threshold 75
 
 # Get JSON output for scripting
-python context_monitor.py --json
+python scripts/context_monitor.py --json
 
 # Show hook installation instructions
-python context_monitor.py --install-hook
+python scripts/context_monitor.py --install-hook
 ```
 
 **Features:**
@@ -212,29 +225,29 @@ python context_monitor.py --install-hook
 - Watch mode for continuous monitoring
 - Can be installed as a SessionStart hook
 
-### 2. Handoff CLI (`handoff_cli.py`)
+### 2. Handoff CLI (`scripts/handoff_cli.py`)
 
 Manage and search your handoff documents.
 
 ```bash
 # List all handoff documents
-python handoff_cli.py list
+python scripts/handoff_cli.py list
 
 # Show the most recent handoff
-python handoff_cli.py show latest
+python scripts/handoff_cli.py show latest
 
 # Show a specific handoff by number
-python handoff_cli.py show 1
+python scripts/handoff_cli.py show 1
 
 # Search across all handoffs
-python handoff_cli.py search "authentication"
+python scripts/handoff_cli.py search "authentication"
 
 # Compare two handoffs
-python handoff_cli.py diff 1 2
-python handoff_cli.py diff latest 2
+python scripts/handoff_cli.py diff 1 2
+python scripts/handoff_cli.py diff latest 2
 
 # Extract a specific section
-python handoff_cli.py extract latest "recent work"
+python scripts/handoff_cli.py extract latest "recent work"
 ```
 
 **Features:**
@@ -244,28 +257,28 @@ python handoff_cli.py extract latest "recent work"
 - Diff comparison between handoffs
 - Extract individual sections
 
-### 3. Analytics (`analytics.py`)
+### 3. Analytics (`scripts/analytics.py`)
 
 Generate insights from your handoff history.
 
 ```bash
 # Overall summary
-python analytics.py summary
+python scripts/analytics.py summary
 
 # Visual timeline of project
-python analytics.py timeline
+python scripts/analytics.py timeline
 
 # Confidence trends
-python analytics.py confidence
+python scripts/analytics.py confidence
 
 # Extract and categorize issues
-python analytics.py issues
+python scripts/analytics.py issues
 
 # Generate full HTML report
-python analytics.py report
+python scripts/analytics.py report
 
 # Export data as JSON
-python analytics.py --export json
+python scripts/analytics.py --export json
 ```
 
 **Features:**
@@ -279,9 +292,9 @@ python analytics.py --export json
 
 **Methodology:** [Don't Sleep On AI — handoff-prompt](https://www.dontsleeponai.com/handoff-prompt)
 
-This skill packages the handoff-prompt methodology (v1.1) as an easy-to-use Claude Code skill.
+This skill packages the handoff-prompt methodology (v1.1) as an easy-to-use Claude Code skill following the official [Claude Skills specification](https://resources.anthropic.com/hubfs/The-Complete-Guide-to-Building-Skill-for-Claude.pdf).
 
-**Version:** 1.0.0
+**Version:** 1.1.0
 
 ## License
 
