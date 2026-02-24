@@ -1,10 +1,21 @@
 {
+  "continuationMethod": "ask",
+  "_comment": "continuationMethod options:",
+  "_comment": "  'ask' - Ask user once which method to use, then remember their choice (default)",
+  "_comment": "  'compact' - Always use Claude Code's built-in /compact",
+  "_comment": "  'handoff' - Always use the handoff-prompt skill",
+  "_comment": "",
+  "_comment": "When set to 'ask', the user will be prompted to choose on first use.",
+  "_comment": "Their choice will be saved to this setting automatically.",
+  "_comment": "",
+  "_comment": "",
   "handoffMode": "clipboard",
-  "_comment": "handoffMode options:",
+  "_comment": "",
+  "_comment": "handoffMode options (only applies when continuationMethod is 'handoff'):",
   "_comment": "  'clipboard' - Resume prompt is copied to clipboard after clearing context",
   "_comment": "  'auto-paste' - Resume prompt is automatically executed after clearing context",
   "_comment": "",
-  "_comment": "You can override this setting per invocation with:",
+  "_comment": "You can override these settings per invocation with:",
   "_comment": "  /handoff --clipboard",
   "_comment": "  /handoff --auto"
 }

@@ -30,7 +30,7 @@ cp handoff-prompt.md ~/.claude/skills/handoff-prompt.md
 
 ### 2. Configure (Optional)
 
-Add the handoff mode setting to your Claude Code `settings.json`:
+Add settings to your Claude Code `settings.json`:
 
 ```bash
 # Edit your settings
@@ -41,13 +41,21 @@ Add this configuration:
 
 ```json
 {
+  "continuationMethod": "ask",
   "handoffMode": "clipboard"
 }
 ```
 
-**Modes:**
-- `clipboard` (default) — Resume prompt is copied to clipboard after clearing context. You paste it manually.
-- `auto-paste` — Resume prompt is automatically executed in the fresh conversation.
+**continuationMethod** — Choose how to handle context clearing:
+- `"ask"` (default) — Ask once which method to use (Compact or Handoff), then remember your choice
+- `"compact"` — Always use Claude Code's built-in `/compact`
+- `"handoff"` — Always use the handoff-prompt skill
+
+**First-time experience:** When set to `"ask"` (or unset), you'll be prompted to choose between Compact and Handoff the first time you clear context. Your choice is saved automatically.
+
+**handoffMode** — How the resume prompt is delivered (when using Handoff):
+- `"clipboard"` (default) — Resume prompt is copied to clipboard after clearing context. You paste it manually.
+- `"auto-paste"` — Resume prompt is automatically executed in the fresh conversation.
 
 ### 3. Use It
 
@@ -136,6 +144,26 @@ You can override your default setting for any invocation:
 /handoff --auto        # Force auto-paste mode
 /handoff --clipboard   # Force clipboard mode
 ```
+
+## Compact vs Handoff
+
+When you're about to clear your context, you now have two options:
+
+| Feature | Compact | Handoff |
+|---------|---------|---------|
+| **Speed** | Fast | Slower (more detailed) |
+| **Detail level** | Brief summary | 8-section structured document |
+| **Decision reasoning** | Minimal | Preserves WHY decisions were made |
+| **Architecture** | Basic overview | Full technical map with data structures |
+| **Recent work** | Summarized | Recency-weighted with reasoning |
+| **Risks & issues** | Maybe mentioned | Dedicated section with edge cases |
+| **Regression protection** | No | Explicit "Do Not Touch" list |
+| **Confidence flags** | No | Yes — shows what to trust |
+| **Best for** | Quick sessions, simple projects | Complex projects, long-term work |
+
+**Choose Compact if:** You're doing quick tasks, simple projects, or just need to reduce context size.
+
+**Choose Handoff if:** You're working on complex projects, need to preserve decision reasoning, or want to hand off work to continue later.
 
 ## File Structure
 

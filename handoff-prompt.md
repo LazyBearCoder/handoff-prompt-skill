@@ -39,38 +39,81 @@ Generates a continuation document with a specific next task directive.
 
 ## Configuration
 
-Add this setting to your Claude Code `settings.json`:
+Add these settings to your Claude Code `settings.json`:
 
 ```json
 {
-  "handoffMode": "clipboard"  // or "auto-paste"
+  "continuationMethod": "ask",     // "compact", "handoff", or "ask" (default)
+  "handoffMode": "clipboard"       // "clipboard" (default) or "auto-paste"
 }
 ```
 
-- **clipboard** (default): After clearing context, the resume prompt is copied to clipboard. You'll be prompted to paste it into your fresh conversation.
-- **auto-paste**: After clearing context, the resume prompt is automatically executed. The AI reads the handoff document and then asks what to work on next.
+### continuationMethod
+
+Controls which method to use when clearing context:
+
+| Value | Behavior |
+|-------|----------|
+| `"ask"` (default) | Ask the user once which method they prefer, then remember their choice |
+| `"compact"` | Always use Claude Code's built-in `/compact` |
+| `"handoff"` | Always use the handoff-prompt skill |
+
+**First-time experience:** When set to `"ask"` (or unset), the skill will ask the user to choose between Compact and Handoff the first time context is cleared. Their choice is saved to settings.json for future sessions.
+
+### handoffMode
+
+Controls how the resume prompt is delivered after handoff:
+
+| Value | Behavior |
+|-------|----------|
+| `"clipboard"` (default) | Resume prompt is copied to clipboard. You paste it manually. |
+| `"auto-paste"` | Resume prompt is automatically executed. |
 
 ## What the Skill Does
 
-1. **Analyzes current conversation** to extract project state, recent work, and decisions
-2. **Generates continuation document** with 8 structured sections:
-   - Project Identity
-   - Current System State
-   - Architecture & Technical Map
-   - Recent Work (Highest Priority) - recency-weighted
-   - What Could Go Wrong
-   - How to Think About This Project
-   - Do Not Touch List
-   - Confidence & Freshness Flags
-3. **Saves document** to `docs/handoffs/AI_Continuation_Document-DATE-TIME.md`
-4. **Clears context** automatically via `/clear`
-5. **Handles resume prompt** based on your mode setting
+1. **Checks user preference** for Compact vs Handoff (asks once if not set)
+2. **If Handoff is chosen:**
+   - Analyzes current conversation to extract project state, recent work, and decisions
+   - Generates continuation document with 8 structured sections
+   - Saves document to `docs/handoffs/AI_Continuation_Document-DATE-TIME.md`
+   - Clears context automatically via `/clear`
+   - Handles resume prompt based on `handoffMode` setting
+3. **If Compact is chosen:**
+   - Delegates to Claude Code's built-in `/compact` command
+
+---
+
+# FIRST-TIME SETUP PROMPT
+
+When this skill is invoked and `continuationMethod` is not set (or is `"ask"`), ask the user:
+
+---
+You're about to clear your context. Which method would you like to use?
+
+**Compact** — Claude Code's built-in context summarization. Faster, less detailed, good for quick context reduction.
+
+**Handoff** — Generates a structured 8-section continuation document with decision reasoning, architecture details, and a resume prompt. Better for complex projects and long-term work.
+
+Your choice will be remembered for future sessions. You can change it anytime in settings.json with `continuationMethod`.
+
+Which would you prefer: [Compact] or [Handoff]?
+---
+
+After the user responds, update their settings.json:
+
+```json
+{
+  "continuationMethod": "handoff"  // or "compact"
+}
+```
+
+Then proceed with the chosen method.
 
 ---
 
 # THE HANDOFF PROMPT
 
-When this skill is invoked, execute the following prompt to generate the continuation document and resume prompt:
+When handoff is selected, execute the following prompt to generate the continuation document and resume prompt:
 
 ---
 
@@ -226,9 +269,21 @@ Unlike generic summaries that treat all information equally, this handoff approa
 - **Regression protection**: Explicit "Do Not Touch" list prevents undoing working code
 - **Confidence flags**: The next AI knows what to trust vs. what to verify
 
+## Compact vs Handoff
+
+| Feature | Compact | Handoff |
+|---------|---------|---------|
+| **Speed** | Fast | Slower (more detailed) |
+| **Detail level** | Summary | 8-section structured document |
+| **Decision reasoning** | Brief | Preserves WHY decisions were made |
+| **Architecture** | Basic | Full technical map |
+| **Regression protection** | No | Explicit "Do Not Touch" list |
+| **Confidence flags** | No | Yes — shows what to trust |
+| **Best for** | Quick sessions, simple projects | Complex projects, long-term work |
+
 ## Version
 
-1.0.0 — Initial skill implementation based on handoff-prompt v1.1 methodology
+1.1.0 — Added continuationMethod setting with first-time user preference prompt
 
 ## Credits
 
