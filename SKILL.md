@@ -93,28 +93,66 @@ Controls how the resume prompt is delivered after handoff:
 
 ---
 
-# FIRST-TIME SETUP PROMPT
+# FIRST-TIME SETUP FLOW
 
-When this skill is invoked and `continuationMethod` is not set (or is `"ask"`), ask the user:
+When this skill is invoked and no config exists, ask these questions in sequence:
 
 ---
+
+## Question 1: Continuation Method
+
 You're about to clear your context. Which method would you like to use?
 
 **Compact** — Claude Code's built-in context summarization. Faster, less detailed, good for quick context reduction.
 
 **Handoff** — Generates a structured 8-section continuation document with decision reasoning, architecture details, and a resume prompt. Better for complex projects and long-term work.
 
-Your choice will be remembered for future sessions. You can change it anytime in settings.json with `continuationMethod`.
+Type `c` for Compact or `h` for Handoff:
 
-Which would you prefer: [Compact] or [Handoff]?
+## Question 2 (only if Handoff): Resume Prompt Delivery
+
+How should the resume prompt be delivered?
+
+**clipboard** — Resume prompt is copied to clipboard. You paste it manually into the fresh conversation.
+
+**auto-paste** — Resume prompt is automatically executed after clearing context.
+
+Type `c` for clipboard or `a` for auto-paste:
+
+## Question 3: Configuration Scope
+
+Where should this configuration be saved?
+
+**project** — Save to `.claude/skills/handoff-prompt/config.json` (this project only)
+
+**global** — Save to `~/.claude/skills/handoff-prompt/config.json` (all projects)
+
+Type `p` for project or `g` for global:
+
 ---
 
-After the user responds, update their settings.json:
+After collecting answers, create the config file:
 
-```json
+**Project-level:**
+```bash
+mkdir -p .claude/skills/handoff-prompt
+cat > .claude/skills/handoff-prompt/config.json << 'EOF'
 {
-  "continuationMethod": "handoff"  // or "compact"
+  "continuationMethod": "handoff",
+  "handoffMode": "clipboard"
 }
+EOF
+```
+
+**Global:**
+```bash
+mkdir -p ~/.claude/skills/handoff-prompt
+cat > ~/.claude/skills/handoff-prompt/config.json << 'EOF'
+{
+  "continuationMethod": "handoff",
+  "handoffMode": "clipboard"
+}
+EOF
 ```
 
 Then proceed with the chosen method.
