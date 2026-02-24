@@ -1,3 +1,13 @@
+---
+name: handoff-prompt
+description: Create a structured AI continuation document before clearing context, enabling seamless handoff to a fresh AI instance. Use when context window is approaching 80% capacity, you've completed a major feature or architectural decision, want to preserve project state and decision reasoning, or need to hand off work to a fresh AI instance.
+license: MIT
+metadata:
+  author: LazyBearCoder
+  version: 1.1.0
+  documentation: https://github.com/LazyBearCoder/handoff-prompt-skill
+---
+
 # handoff-prompt
 
 Create a structured AI continuation document before clearing context, enabling seamless handoff to a fresh AI instance.
@@ -281,9 +291,15 @@ Unlike generic summaries that treat all information equally, this handoff approa
 | **Confidence flags** | No | Yes — shows what to trust |
 | **Best for** | Quick sessions, simple projects | Complex projects, long-term work |
 
-## Version
+## Included Tools
 
-1.1.0 — Added continuationMethod setting with first-time user preference prompt
+This skill includes Python utilities for enhanced workflow:
+
+- **`scripts/context_monitor.py`** — Monitor your Claude Code context usage and get warnings when approaching threshold
+- **`scripts/handoff_cli.py`** — Manage and search your handoff documents
+- **`scripts/analytics.py`** — Generate insights from your handoff history
+
+These tools are standalone and can be run directly from your terminal when needed.
 
 ## Credits
 
