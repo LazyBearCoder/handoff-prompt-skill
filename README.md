@@ -38,6 +38,21 @@ cp -r handoff-prompt ~/.claude/skills/
 
 ### 2. Configure (Optional)
 
+**Option A: Interactive Configuration Wizard (Recommended)**
+
+Run the included configuration wizard for guided setup:
+
+```bash
+python scripts/config_wizard.py
+```
+
+The wizard will guide you through:
+- Choosing continuation method (Compact or Handoff)
+- Selecting resume prompt delivery (if using Handoff)
+- Setting configuration scope (project or global)
+
+**Option B: Manual Configuration**
+
 Settings are stored using a fallback chain:
 
 1. **Project-level** — `.claude/skills/handoff-prompt/config.json` (overrides all others)
@@ -195,6 +210,7 @@ When you're about to clear your context, you now have two options:
 handoff-prompt/              # Skill folder (install this entire folder)
 ├── SKILL.md                 # The main skill file with YAML frontmatter
 ├── scripts/                 # Python utilities
+│   ├── config_wizard.py     # Interactive configuration wizard
 │   ├── context_monitor.py   # Context usage monitoring tool
 │   ├── handoff_cli.py       # Handoff document manager CLI
 │   └── analytics.py         # Analytics and reporting tool
@@ -211,9 +227,29 @@ handoff-prompt/              # Skill folder (install this entire folder)
 
 ## Python Tools
 
-Three standalone Python scripts are included to enhance your handoff workflow:
+Four standalone Python scripts are included to enhance your handoff workflow:
 
-### 1. Context Monitor (`scripts/context_monitor.py`)
+### 1. Configuration Wizard (`scripts/config_wizard.py`)
+
+Interactive TUI wizard for configuring the handoff-prompt skill.
+
+```bash
+# Run the configuration wizard
+python scripts/config_wizard.py
+```
+
+**Features:**
+- Keyboard-driven menu navigation (arrow keys)
+- Guided setup for all configuration options
+- Choose between project and global configuration
+- Optional dependency on `simple-term-menu` for enhanced UI
+
+**Recommended:** Install `simple-term-menu` for a better TUI experience:
+```bash
+pip install simple-term-menu
+```
+
+### 2. Context Monitor (`scripts/context_monitor.py`)
 
 Monitors your Claude Code context usage and suggests running `/handoff` when approaching threshold.
 
@@ -241,7 +277,7 @@ python scripts/context_monitor.py --install-hook
 - Watch mode for continuous monitoring
 - Can be installed as a SessionStart hook
 
-### 2. Handoff CLI (`scripts/handoff_cli.py`)
+### 3. Handoff CLI (`scripts/handoff_cli.py`)
 
 Manage and search your handoff documents.
 
@@ -273,7 +309,7 @@ python scripts/handoff_cli.py extract latest "recent work"
 - Diff comparison between handoffs
 - Extract individual sections
 
-### 3. Analytics (`scripts/analytics.py`)
+### 4. Analytics (`scripts/analytics.py`)
 
 Generate insights from your handoff history.
 
@@ -322,6 +358,7 @@ Ideas for improvements:
 - [x] Auto-detect context threshold and suggest `/handoff` → `context_monitor.py`
 - [x] Visual analytics from handoff history → `analytics.py`
 - [x] Handoff document management → `handoff_cli.py`
+- [x] Interactive configuration wizard → `config_wizard.py`
 - [ ] Support for multiple handoff documents (e.g., per-feature)
 - [ ] Integration with git to link handoffs to commits
 - [ ] Visual confidence indicators in generated documents
